@@ -1,9 +1,11 @@
-@Library('pipeline-shared-library-example@3cad2aa') _
+@Library('pipeline-shared-library-example@94f7408') _
 
-def repoName = "devops-course-app"
-def needDeploying = env.BRANCH_NAME == 'master' || env.BRANCH_NAME != 'develop'
-def jdk = 'JDK8'
-def imageName = 'owner/image-name'
+def props = [
+    repoName: "devops-course-app",
+    jdk: 'JDK8',
+    imageName: 'owner/image-name',
+    isImagePushRequired: env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop' || true
+]
 
 sharedLib = own
 
@@ -28,7 +30,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                withMaven(maven: 'Maven3.6.3', jdk: "${jdk}", mavenOpts: '-Dmaven.test.skip=true') {
+                withMaven(maven: 'Maven3.6.3', jdk: "${props.jdk}", mavenOpts: '-Dmaven.test.skip=true') {
                     script {
                         sharedLib.buildArtifacts()
                     }
@@ -37,54 +39,48 @@ pipeline {
 
             post {
                 unsuccessful {
-                    sayAboutError(repoName)
+                    script {
+                        sharedLib.sayAboutError(props)
+                    }
                 }
             }
         }
 
         stage('Build Image') {
-            when { expression { return needDeploying } }
+            when { expression { return props.isImagePushRequired } }
 
             steps {
                 script {
                     def tag = sharedLib.getTag()
-                    buildImage(tag)
+                    sharedLib.buildImage(tag)
                 }
             }
 
             post {
                 unsuccessful {
-                    sayAboutError(repoName)
+                    script {
+                        sharedLib.sayAboutError(props)
+                    }
                 }
             }
         }
 
         stage('Push to AWS') {
-            when { expression { return needDeploying } }
+            when { expression { return props.isImagePushRequired } }
 
             steps {
-				script {
-					pushImageToAWS()
-				}
+                script {
+                    sharedLib.pushImageToAWS()
+                }
             }
 
             post {
                 unsuccessful {
-                    sayAboutError(repoName)
+                    script {
+                        sharedLib.sayAboutError(props)
+                    }
                 }
             }
         }
     }
-}
-
-def buildImage(tag) {
-    echo "Build image with tag = ${tag}..."
-}
-
-def sayAboutError(repoName) {
-    echo "${repoName} BUILD FAILED: branch: ${env.GIT_BRANCH}"
-}
-
-def pushImageToAWS() {
-    echo "Publish image..."
 }
