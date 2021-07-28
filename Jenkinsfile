@@ -1,10 +1,11 @@
-@Library('pipeline-shared-library-example@94f7408') _
+@Library('pipeline-shared-library-example@ecf42d4') _
 
 def props = [
     repoName: "devops-course-app",
     jdk: 'JDK8',
     imageName: 'owner/image-name',
-    isImagePushRequired: env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop' || true
+    isImagePushRequired: env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop' || true,
+    notificationSlackTarget: '#finance_manager_back-end'
 ]
 
 sharedLib = own
@@ -40,7 +41,7 @@ pipeline {
             post {
                 unsuccessful {
                     script {
-                        sharedLib.sayAboutError(props)
+                        sharedLib.slackOnError(props)
                     }
                 }
             }
@@ -52,14 +53,14 @@ pipeline {
             steps {
                 script {
                     def tag = sharedLib.getTag()
-                    sharedLib.buildImage(tag)
+                    sharedLib.buildDockerImage(props, tag)
                 }
             }
 
             post {
                 unsuccessful {
                     script {
-                        sharedLib.sayAboutError(props)
+                        sharedLib.slackOnError(props)
                     }
                 }
             }
@@ -77,7 +78,7 @@ pipeline {
             post {
                 unsuccessful {
                     script {
-                        sharedLib.sayAboutError(props)
+                        sharedLib.slackOnError(props)
                     }
                 }
             }
