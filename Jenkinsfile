@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                withMaven(maven: 'Maven3.6.3', jdk: "${jdk}") {
+                withMaven(maven: 'Maven3.6.3', jdk: "${jdk}", mavenOpts: '-Dmaven.test.skip=true') {
                 	buildArtifacts()
 				}
             }
@@ -77,7 +77,7 @@ def getTag() {
 }
 
 def buildImage(tagValue) {
-    echo "Build image..."
+    echo "Build image with tagValue = ${tagValue}..."
 }
 
 def sayAboutError(repoName) {
