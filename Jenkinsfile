@@ -1,4 +1,4 @@
-@Library('pipeline-shared-library-example') _
+@Library('pipeline-shared-library-example@3cad2aa') _
 
 def repoName = "devops-course-app"
 def needDeploying = env.BRANCH_NAME == 'master' || env.BRANCH_NAME != 'develop'
