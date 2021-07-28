@@ -75,8 +75,8 @@ def getTag() {
     return tagValue
 }
 
-def buildImage(tagValue) {
-    echo "Build image with tagValue = ${tagValue}..."
+def buildImage(tagVal) {
+    echo "Build image with tagValue = ${tagVal}..."
 }
 
 def sayAboutError(repoName) {
