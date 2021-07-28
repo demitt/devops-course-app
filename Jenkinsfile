@@ -72,6 +72,7 @@ def getTag() {
         GIT_COMMIT_HASH_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
         DATE_PART = new SimpleDateFormat("YYYYMMdd-'r'HHmm").format(new Date())
         def tagValue = "${DATE_PART}_${GIT_COMMIT_HASH_SHORT}"
+        echo "${tagValue}"
     }
     return tagValue
 }
