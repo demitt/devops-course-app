@@ -12,7 +12,17 @@ pipeline {
 
     agent any
 
+    /* tools {
+        maven 'Maven3.6.3'
+    } */
+
     stages {
+        /* stage('Clone sources') {
+            steps {
+                git url: 'https://github.com/demitt/devops-course-app.git', branch: 'shared-libraries'
+            }
+        } */
+
         stage('Build') {
             steps {
                 withMaven(maven: 'Maven3.6.3', jdk: "${jdk}", mavenOpts: '-Dmaven.test.skip=true') {
@@ -32,7 +42,8 @@ pipeline {
 
             steps {
 				script {
-					buildImage(getTag())
+				    def tag = getTag()
+					buildImage(tag)
 				}
             }
 
@@ -67,16 +78,17 @@ def buildArtifacts() {
 }
 
 def getTag() {
+    def tag
     script {
         GIT_COMMIT_HASH_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
         DATE_PART = new SimpleDateFormat("YYYYMMdd-'r'HHmm").format(new Date())
-        def tagValue = "${DATE_PART}_${GIT_COMMIT_HASH_SHORT}"
+        tag = "${DATE_PART}_${GIT_COMMIT_HASH_SHORT}"
     }
-    return tagValue
+    return tag
 }
 
-def buildImage(tagVal) {
-    echo "Build image with tagValue = ${tagVal}..."
+def buildImage(tag) {
+    echo "Build image with tag = ${tag}..."
 }
 
 def sayAboutError(repoName) {
