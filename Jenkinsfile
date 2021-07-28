@@ -1,9 +1,12 @@
-import java.text.SimpleDateFormat
+@Library('pipeline-shared-library-example') _
 
 def repoName = "devops-course-app"
 def needDeploying = env.BRANCH_NAME == 'master' || env.BRANCH_NAME != 'develop'
 def jdk = 'JDK8'
 def imageName = 'owner/image-name'
+
+sharedLib = own
+
 
 pipeline {
     options {
@@ -26,8 +29,10 @@ pipeline {
         stage('Build') {
             steps {
                 withMaven(maven: 'Maven3.6.3', jdk: "${jdk}", mavenOpts: '-Dmaven.test.skip=true') {
-                	buildArtifacts()
-				}
+                    script {
+                        sharedLib.buildArtifacts()
+                    }
+                }
             }
 
             post {
@@ -41,10 +46,10 @@ pipeline {
             when { expression { return needDeploying } }
 
             steps {
-				script {
-				    def tag = getTag()
-					buildImage(tag)
-				}
+                script {
+                    def tag = sharedLib.getTag()
+                    buildImage(tag)
+                }
             }
 
             post {
@@ -70,21 +75,6 @@ pipeline {
             }
         }
     }
-}
-
-def buildArtifacts() {
-    sh script: """mvn clean package""",
-            label: 'Build artifacts'
-}
-
-def getTag() {
-    def tag
-    script {
-        GIT_COMMIT_HASH_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-        DATE_PART = new SimpleDateFormat("YYYYMMdd-'r'HHmm").format(new Date())
-        tag = "${DATE_PART}_${GIT_COMMIT_HASH_SHORT}"
-    }
-    return tag
 }
 
 def buildImage(tag) {
