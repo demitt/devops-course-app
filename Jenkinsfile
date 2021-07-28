@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
 def repoName = "devops-course-app"
-def needDeploying = env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop'
+def needDeploying = env.BRANCH_NAME == 'master' || env.BRANCH_NAME != 'develop'
 def jdk = 'JDK8'
 def imageName = 'owner/image-name'
 
