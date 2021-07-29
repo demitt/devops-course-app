@@ -1,4 +1,4 @@
-@Library('pipeline-shared-library-example@ecf42d4') _
+@Library('pipeline-shared-library-example@v0.1-PRE') _
 
 def props = [
     repoName: "devops-course-app",
