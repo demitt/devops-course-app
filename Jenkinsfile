@@ -1,4 +1,4 @@
-@Library('pipeline-shared-library-example@v0.1-PRE') _
+@Library('pipeline-shared-library-example@5b3ca4e') _
 
 def props = [
     repoName: "devops-course-app",
@@ -8,7 +8,7 @@ def props = [
     notificationSlackTarget: '#finance_manager_back-end'
 ]
 
-sharedLib = own
+sharedLib = firstTest
 
 
 pipeline {
